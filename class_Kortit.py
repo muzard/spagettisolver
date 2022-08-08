@@ -190,8 +190,9 @@ def hicard(kortit: list):
             lista.append(kortti.arvo)
     return sorted(lista, reverse=True)
 
+
+# määrittele_käsi toimii
 def maarittele_kasi(kortit: list):
-    # värisuora, lisää arvon kertominen myöhemmin
     if onko_suora(kortit) and onko_vari(kortit):
         return f"{onko_vari(kortit)[1]}värisuora, {onko_suora(kortit)[1]}"
 
