@@ -17,7 +17,7 @@ class Pakka:
         maat = ["Hertta", "Ruutu", "Pata", "Risti"]
         for maa in maat:
             for n in range(1, 14):
-                kortti = Kortti(maa, n)
+                kortti = Kortti(n, maa)
                 self.pakka.append(kortti)
     
     def sekoita(self):
@@ -105,21 +105,21 @@ def onko_vari(kortit: list):
     for kortti in kortit[1:]:
         if kortti.maa != eka_maa:
             return False
-    return True
+    return True, eka_maa
 
 def onko_suora(kortit: list):
     numerolista = []
     for kortti in kortit:
         numerolista.append(kortti.arvo)
     numerolista.sort()
-    print(numerolista)
 
     if numerolista == [1, 10, 11, 12, 13]:
-        return True
+        return True, "10-A"
     for i in range(1, 5):
         if numerolista[i] != numerolista[i - 1] + 1:
             return False
-    return True
+    tulos = str(numerolista[0])+"-"+str(numerolista[-1])
+    return True, tulos
 
 def neloset(kortit: list):
     lista = []
@@ -146,3 +146,87 @@ def fullhouse(kortit: list):
                 pari = kortti.arvo
         
         return (True, trips, pari)
+
+def trips(kortit: list):
+    # palauttaa True ja kortti jota kolme
+    lista = []
+    for kortti in kortit:
+        lista.append(kortti.arvo)
+    for kortti in lista:
+        if lista.count(kortti) == 3:
+            return (True, kortti)
+    return False
+
+def two_pair(kortit):
+    cards = []
+    for kortti in kortit:
+        cards.append(kortti.arvo)
+    if len(set(cards)) == 3:
+        parit = []
+        for card in cards:
+            if cards.count(card) == 2:
+                parit.append(card)
+                cards.remove(card)
+        cards.sort(reverse=True)
+        return True, cards
+    return False
+
+def pair(kortit: list):
+    lista = []
+    for kortti in kortit:
+        lista.append(kortti.arvo)
+    for card in lista:
+        if lista.count(card) == 2:
+            return (True, card)
+    return False
+
+def hicard(kortit: list):
+    # muuttaa ässän 14, muuten normaali ja palauttaa numerot järjestyksessä
+    lista = []
+    for kortti in kortit:
+        if kortti.arvo == 1:
+            lista.append(14)
+        else:
+            lista.append(kortti.arvo)
+    return sorted(lista, reverse=True)
+
+def maarittele_kasi(kortit: list):
+    # värisuora, lisää arvon kertominen myöhemmin
+    if onko_suora(kortit) and onko_vari(kortit):
+        return f"{onko_vari(kortit)[1]}värisuora, {onko_suora(kortit)[1]}"
+
+    elif neloset(kortit):
+        return f"{neloset(kortit)[1]}-neloset"
+
+    elif fullhouse(kortit):
+        return f"full house, {fullhouse(kortit)[1]} täynnä {fullhouse(kortit)[2]}"
+
+    elif onko_vari(kortit):
+        return f"{onko_vari(kortit)[1]}väri"
+
+    elif onko_suora(kortit):
+        return f"suora, {onko_suora(kortit)[1]}"
+
+    elif trips(kortit):
+        return f"{trips(kortit)[1]}-kolmoset"
+
+    elif two_pair(kortit):
+        return f"kaksi paria, {two_pair(kortit)[1][0]} ja {two_pair(kortit)[1][1]}"
+
+    elif pair(kortit):
+        return f"{pair(kortit)[1]}-pari"
+
+    else:
+        return f"High card {hicard(kortit)[0]}"
+
+
+pakka = Pakka()
+pakka.kasaa()
+pakka.sekoita()
+
+korttipino = []
+
+for i in range(5):
+    korttipino.append(pakka.jaa())
+
+print(maarittele_kasi(korttipino))
