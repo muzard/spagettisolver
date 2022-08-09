@@ -39,11 +39,15 @@ class Pelaaja:
 # Pakka toimii ??
 #
 
-def make_a_table(n: int):
+def make_a_table():
     # loop for making players
     pelaajat = []
-    for i in range(n):
+    MorePlayers = True
+    while MorePlayers:
         nimi = input("nimi:")
+        if nimi == "":
+            MorePlayers = False
+            break
         player = Pelaaja(nimi)
         pelaajat.append(player)
     return pelaajat
@@ -90,11 +94,11 @@ def hand(pelaajat: list, pakka: Pakka):
     print("river")
     print(river)
 
-def main_kasi():
+def main_hand():
     pakka = Pakka()
     pakka.kasaa()
     pakka.sekoita()
-    pelaajat = make_a_table(5)
+    pelaajat = make_a_table()
     hand(pelaajat, pakka)
 
 # Käsien tunnistus
@@ -253,13 +257,7 @@ def kaden_arvo(kortit: list):
     else:
         return 1, hicard(kortit), kortit
 
+def winning_hand(list_of_hands: list):
+    pass
 
-pakka = Pakka()
-pakka.kasaa()
-pakka.sekoita()
-
-korttipino = []
-
-print(kaden_arvo(korttipino))
-
-print(maarittele_kasi(korttipino))
+main_hand()
