@@ -80,17 +80,21 @@ def hand(pelaajat: list, pakka: Pakka):
     river = pakka.jaa()
 
     for pelaaja in pelaajat:
+        print("")
         print(pelaaja.name)
         for item in pelaaja.hand:
             print(item)
     
+    print("")
     print("flop")
     for item in flop:
         print(item)
 
+    print("")
     print("turn")
     print(turn)
 
+    print("")
     print("river")
     print(river)
 
