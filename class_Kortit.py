@@ -1,4 +1,5 @@
 #Kortit
+from audioop import reverse
 from random import shuffle as sekoita
 
 class Kortti:
@@ -114,12 +115,11 @@ def onko_suora(kortit: list):
     numerolista.sort()
 
     if numerolista == [1, 10, 11, 12, 13]:
-        return True, "10-A"
+        return True, 14
     for i in range(1, 5):
         if numerolista[i] != numerolista[i - 1] + 1:
             return False
-    tulos = str(numerolista[0])+"-"+str(numerolista[-1])
-    return True, tulos
+    return True, numerolista[-1]
 
 def neloset(kortit: list):
     lista = []
@@ -165,10 +165,14 @@ def two_pair(kortit):
         parit = []
         for card in cards:
             if cards.count(card) == 2:
-                parit.append(card)
-                cards.remove(card)
-        cards.sort(reverse=True)
-        return True, cards
+                if card == 1:
+                    parit.append(14)
+                    cards.remove(1)
+                else:
+                    parit.append(card)
+                    cards.remove(card)
+        parit.sort(reverse=True)
+        return True, parit
     return False
 
 def pair(kortit: list):
@@ -194,7 +198,7 @@ def hicard(kortit: list):
 # määrittele_käsi toimii
 def maarittele_kasi(kortit: list):
     if onko_suora(kortit) and onko_vari(kortit):
-        return f"{onko_vari(kortit)[1]}värisuora, {onko_suora(kortit)[1]}"
+        return f"{onko_vari(kortit)[1]}värisuora, suurin {onko_suora(kortit)[1]}"
 
     elif neloset(kortit):
         return f"{neloset(kortit)[1]}-neloset"
@@ -220,6 +224,34 @@ def maarittele_kasi(kortit: list):
     else:
         return f"High card {hicard(kortit)[0]}"
 
+def kaden_arvo(kortit: list):
+    if onko_suora(kortit) and onko_vari(kortit):
+        return 9, onko_suora(kortit)[1]
+
+    elif neloset(kortit):
+        return 8, neloset(kortit)[1]
+
+    elif fullhouse(kortit):
+        return 7, fullhouse(kortit)[1], fullhouse(kortit)[2]
+
+    elif onko_vari(kortit):
+        return 6
+
+    elif onko_suora(kortit):
+        return 5, onko_suora(kortit)[1]
+
+    elif trips(kortit):
+        return 4, trips(kortit)[1]
+
+    elif two_pair(kortit):
+        return 3, two_pair(kortit)[1][0], two_pair(kortit)[1][1]
+
+    elif pair(kortit):
+        return 2, pair(kortit)[1]
+
+    else:
+        return 1, hicard(kortit)
+
 
 pakka = Pakka()
 pakka.kasaa()
@@ -227,7 +259,6 @@ pakka.sekoita()
 
 korttipino = []
 
-for i in range(5):
-    korttipino.append(pakka.jaa())
+print(kaden_arvo(korttipino))
 
 print(maarittele_kasi(korttipino))
