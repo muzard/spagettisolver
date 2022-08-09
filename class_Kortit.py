@@ -224,33 +224,34 @@ def maarittele_kasi(kortit: list):
     else:
         return f"High card {hicard(kortit)[0]}"
 
+# palauttaa käden arvon, mahdollisen vertailukohteen ja viimeisenä iteminä [-1] kortit mahdollisia hiCard vertailuja varten
 def kaden_arvo(kortit: list):
     if onko_suora(kortit) and onko_vari(kortit):
-        return 9, onko_suora(kortit)[1]
+        return 9, onko_suora(kortit)[1], kortit
 
     elif neloset(kortit):
-        return 8, neloset(kortit)[1]
+        return 8, neloset(kortit)[1], kortit
 
     elif fullhouse(kortit):
-        return 7, fullhouse(kortit)[1], fullhouse(kortit)[2]
+        return 7, fullhouse(kortit)[1], fullhouse(kortit)[2], kortit
 
     elif onko_vari(kortit):
-        return 6
+        return 6, kortit
 
     elif onko_suora(kortit):
-        return 5, onko_suora(kortit)[1]
+        return 5, onko_suora(kortit)[1], kortit
 
     elif trips(kortit):
-        return 4, trips(kortit)[1]
+        return 4, trips(kortit)[1], kortit
 
     elif two_pair(kortit):
-        return 3, two_pair(kortit)[1][0], two_pair(kortit)[1][1]
+        return 3, two_pair(kortit)[1][0], two_pair(kortit)[1][1], kortit
 
     elif pair(kortit):
-        return 2, pair(kortit)[1]
+        return 2, pair(kortit)[1], kortit
 
     else:
-        return 1, hicard(kortit)
+        return 1, hicard(kortit), kortit
 
 
 pakka = Pakka()
