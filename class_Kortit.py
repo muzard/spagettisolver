@@ -41,16 +41,16 @@ class Pelaaja:
 
 def make_a_table():
     # loop for making players
-    pelaajat = []
+    players = []
     MorePlayers = True
     while MorePlayers:
-        nimi = input("nimi:")
-        if nimi == "":
+        name = input("name:")
+        if name == "":
             MorePlayers = False
             break
-        player = Pelaaja(nimi)
-        pelaajat.append(player)
-    return pelaajat
+        player = Pelaaja(name)
+        players.append(player)
+    return players
 
 # Käsi
 
@@ -261,7 +261,79 @@ def kaden_arvo(kortit: list):
     else:
         return 1, hicard(kortit), kortit
 
-def winning_hand(list_of_hands: list):
-    pass
 
-main_hand()
+def make_a_table():
+    # loop for making players
+    players = []
+    MorePlayers = True
+    while MorePlayers:
+        name = input("name:")
+        if name == "":
+            MorePlayers = False
+            break
+        player = Pelaaja(name)
+        players.append(player)
+    return players
+
+# Käsi
+
+def hand2(pelaajat: list, pakka: Pakka):
+    hands = len(pelaajat)
+    #pelaajien kortit
+    for i in range(2):
+        for i in range(hands):
+            kortti = pakka.jaa()
+            player = pelaajat[i]
+            player.hand.append(kortti)
+
+    community_cards = []
+    for i in range(5):
+        community_cards.append(pakka.jaa())
+    
+    return community_cards, pelaajat
+
+def main_hand():
+    pakka = Pakka()
+    pakka.kasaa()
+    pakka.sekoita()
+    pelaajat = make_a_table()
+    return hand2(pelaajat, pakka)
+
+peli = main_hand()
+    
+def hand_variations(player: Pelaaja, community_cards: list): # player by looping thru main_hand return value pelaajat,
+    # community card by from main_hand return value community_cards
+    holecards = player.hand
+    communitycards = community_cards
+
+    variations = []
+    variations.append(communitycards)
+
+    # 1 holecard, 4 community cards
+
+    ccl1 = communitycards[:] # community card list 1
+    cc1 = ccl1.pop(-1) # community card 1
+    vccl1 = ccl1[:] # variable ccl1
+
+    four_card_list = []
+
+    four_card_list.append(ccl1)
+
+    vccl1[0] = cc1
+    four_card_list.append(vccl1)
+
+    vccl1 = ccl1[:]
+    vccl1[1] = cc1
+    four_card_list.append(vccl1)
+
+    vccl1 = ccl1[:]
+    vccl1[2] = cc1
+    four_card_list.append(vccl1)
+
+    vccl1 = ccl1[:]
+    vccl1[3] = cc1
+    four_card_list.append(vccl1)
+    vccl1 = ccl1[:]
+# lisäilee pariin ekaan kortin kaksi kertaa ^^
+
+hand_variations(peli[1][0], peli[0])
