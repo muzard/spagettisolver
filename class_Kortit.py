@@ -311,6 +311,9 @@ def hand_variations(player: Pelaaja, community_cards: list): # player by looping
 
     # 1 holecard, 4 community cards
 
+    #### THIS THING #####
+    # makes all subgroups of four cards from five community cards, same logic will follow for subgroups of 3
+
     ccl1 = communitycards[:] # community card list 1
     cc1 = ccl1.pop(-1) # community card 1
     vccl1 = ccl1[:] # variable ccl1
