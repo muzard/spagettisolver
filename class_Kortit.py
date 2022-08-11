@@ -1,42 +1,42 @@
 #Kortit
 from audioop import reverse
-from random import shuffle as sekoita
+from random import shuffle as shuffle
 
-class Kortti:
-    def __init__(self, arvo: int, maa: str):
-        self.arvo = arvo
-        self.maa = maa
+class Card:
+    def __init__(self, value: int, suit: str):
+        self.value = value
+        self.suit = suit
 
     def __str__(self):
-        return f"{self.maa} {self.arvo}"
+        return f"{self.suit} {self.value}"
 
-class Pakka:
+class Deck:
     def __init__(self):
-        self.pakka = []
+        self.deck = []
     
-    def kasaa(self):
-        maat = ["Hertta", "Ruutu", "Pata", "Risti"]
-        for maa in maat:
+    def make_deck(self):
+        suits = ["Heart", "Diamond", "Spade", "Club"]
+        for suit in suits:
             for n in range(1, 14):
-                kortti = Kortti(n, maa)
-                self.pakka.append(kortti)
+                card = Card(n, suit)
+                self.deck.append(card)
     
-    def sekoita(self):
-        sekoita(self.pakka)
+    def shuffle(self):
+        shuffle(self.deck)
     
-    #jakaa päällimmän
-    def jaa(self):
-        kortti = self.pakka[-1]
-        self.pakka.remove(kortti)
-        return kortti
+    #deals the top card
+    def deal(self):
+        card = self.deck[-1]
+        self.deck.remove(card)
+        return card
 
-class Pelaaja:
-    def __init__(self, nimi: str):
-        self.name = nimi
+class Player:
+    def __init__(self, name: str):
+        self.name = name
         self.hand = []
 
 #
-# Pakka toimii ??
+# Deck works
 #
 
 def make_a_table():
@@ -48,41 +48,41 @@ def make_a_table():
         if name == "":
             MorePlayers = False
             break
-        player = Pelaaja(name)
+        player = Player(name)
         players.append(player)
     return players
 
-# Käsi
-
-def hand(pelaajat: list, pakka: Pakka):
-    hands = len(pelaajat)
-    #pelaajien kortit
+# Hand
+# this function will probably become obsolete
+def hand(players: list, deck: Deck):
+    hands = len(players)
+    #deals cards for the players
     for i in range(2):
         for i in range(hands):
-            kortti = pakka.jaa()
-            player = pelaajat[i]
-            player.hand.append(kortti)
+            card = deck.deal()
+            player = players[i]
+            player.hand.append(card)
 
 
-    # burnit sekä kortit
+    # burns and cards
     flop = []
     turn = ""
     river = ""
-    #poltto
-    pakka.jaa()
+    # burn
+    deck.deal()
     #flop
     for i in range(3):
-        kortti = pakka.jaa()
-        flop.append(kortti)
+        card = deck.deal()
+        flop.append(card)
     # turn
-    turn = pakka.jaa()
+    turn = deck.deal()
     # river
-    river = pakka.jaa()
+    river = deck.deal()
 
-    for pelaaja in pelaajat:
+    for player in players:
         print("")
-        print(pelaaja.name)
-        for item in pelaaja.hand:
+        print(player.name)
+        for item in player.hand:
             print(item)
     
     print("")
@@ -99,16 +99,14 @@ def hand(pelaajat: list, pakka: Pakka):
     print(river)
 
 def main_hand():
-    pakka = Pakka()
-    pakka.kasaa()
-    pakka.sekoita()
-    pelaajat = make_a_table()
-    hand(pelaajat, pakka)
+    deck = Deck()
+    deck.make_deck()
+    deck.shuffle()
+    players = make_a_table()
+    hand(players, deck)
 
-# Käsien tunnistus
-# tunnistaa käden viidellä kortilla
+# hand recognition
 
-# palautettavaksi asetettava käden arvo tai tehtävä vertailualgo, jotta myöhemmin (paska O) voi kokeilla kombinaatiot 5 community 0 hole, 4 c 1 h, 3 c 2 h
 def onko_vari(kortit: list):
     eka_maa = kortit[0].maa
     for kortti in kortit[1:]:
