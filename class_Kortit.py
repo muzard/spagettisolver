@@ -1,6 +1,7 @@
-#Kortit
+# cards
 from audioop import reverse
 from random import shuffle as shuffle
+
 
 class Card:
     def __init__(self, value: int, suit: str):
@@ -10,25 +11,27 @@ class Card:
     def __str__(self):
         return f"{self.suit} {self.value}"
 
+
 class Deck:
     def __init__(self):
         self.deck = []
-    
+
     def make_deck(self):
         suits = ["Heart", "Diamond", "Spade", "Club"]
         for suit in suits:
             for n in range(1, 14):
                 card = Card(n, suit)
                 self.deck.append(card)
-    
+
     def shuffle(self):
         shuffle(self.deck)
-    
-    #deals the top card
+
+    # deals the top card
     def deal(self):
         card = self.deck[-1]
         self.deck.remove(card)
         return card
+
 
 class Player:
     def __init__(self, name: str):
@@ -38,6 +41,7 @@ class Player:
 #
 # Deck works
 #
+
 
 def make_a_table():
     # loop for making players
@@ -54,15 +58,16 @@ def make_a_table():
 
 # Hand
 # this function will probably become obsolete
+
+
 def hand(players: list, deck: Deck):
     hands = len(players)
-    #deals cards for the players
+    # deals cards for the players
     for i in range(2):
         for i in range(hands):
             card = deck.deal()
             player = players[i]
             player.hand.append(card)
-
 
     # burns and cards
     flop = []
@@ -70,7 +75,7 @@ def hand(players: list, deck: Deck):
     river = ""
     # burn
     deck.deal()
-    #flop
+    # flop
     for i in range(3):
         card = deck.deal()
         flop.append(card)
@@ -84,7 +89,7 @@ def hand(players: list, deck: Deck):
         print(player.name)
         for item in player.hand:
             print(item)
-    
+
     print("")
     print("flop")
     for item in flop:
@@ -98,6 +103,7 @@ def hand(players: list, deck: Deck):
     print("river")
     print(river)
 
+
 def main_hand():
     deck = Deck()
     deck.make_deck()
@@ -107,157 +113,168 @@ def main_hand():
 
 # hand recognition
 
-def onko_vari(kortit: list):
-    eka_maa = kortit[0].maa
-    for kortti in kortit[1:]:
-        if kortti.maa != eka_maa:
+
+def is_suited(cards: list):
+    first_card_suit = cards[0].suit
+    for card in cards[1:]:
+        if card.suit != first_card_suit:
             return False
-    return True, eka_maa
+    return True, first_card_suit
 
-def onko_suora(kortit: list):
-    numerolista = []
-    for kortti in kortit:
-        numerolista.append(kortti.arvo)
-    numerolista.sort()
 
-    if numerolista == [1, 10, 11, 12, 13]:
+def is_straight(cards: list):
+    num_list = []
+    for card in cards:
+        num_list.append(card.value)
+    num_list.sort()
+
+    if num_list == [1, 10, 11, 12, 13]:
         return True, 14
     for i in range(1, 5):
-        if numerolista[i] != numerolista[i - 1] + 1:
+        if num_list[i] != num_list[i - 1] + 1:
             return False
-    return True, numerolista[-1]
+    return True, num_list[-1]
 
-def neloset(kortit: list):
-    lista = []
-    for kortti in kortit:
-        lista.append(kortti.arvo)
-    for arvo in lista:
-        if lista.count(arvo) == 4:
-            return (True, arvo)
 
-def fullhouse(kortit: list):
-    # palauttaa joko (True, trips arvo, pari arvo) tai False
-    lista = []
-    for kortti in kortit:
-        lista.append(kortti.arvo)
-    if len(set(lista)) != 2:
+def four_of_a_kind(cards: list):
+    cardlist = []
+    for card in cards:
+        cardlist.append(card.value)
+    for value in cardlist:
+        if cardlist.count(value) == 4:
+            return (True, value)
+
+
+def fullhouse(cards: list):
+    # returns either (True, value of trips, value of pair) or False
+    cardlist = []
+    for card in cards:
+        cardlist.append(card.value)
+    if len(set(cardlist)) != 2:
         return False
     else:
         trips = 0
-        pari = 0
-        for kortti in kortit:
-            if lista.count(kortti.arvo) == 3:
-                trips = kortti.arvo
-            elif lista.count(kortti.arvo) == 2:
-                pari = kortti.arvo
-        
-        return (True, trips, pari)
-
-def trips(kortit: list):
-    # palauttaa True ja kortti jota kolme
-    lista = []
-    for kortti in kortit:
-        lista.append(kortti.arvo)
-    for kortti in lista:
-        if lista.count(kortti) == 3:
-            return (True, kortti)
-    return False
-
-def two_pair(kortit):
-    cards = []
-    for kortti in kortit:
-        cards.append(kortti.arvo)
-    if len(set(cards)) == 3:
-        parit = []
+        pair = 0
         for card in cards:
-            if cards.count(card) == 2:
-                if card == 1:
-                    parit.append(14)
-                    cards.remove(1)
-                else:
-                    parit.append(card)
-                    cards.remove(card)
-        parit.sort(reverse=True)
-        return True, parit
-    return False
+            if cardlist.count(card.value) == 3:
+                trips = card.value
+            elif cardlist.count(card.value) == 2:
+                pair = card.value
 
-def pair(kortit: list):
-    lista = []
-    for kortti in kortit:
-        lista.append(kortti.arvo)
-    for card in lista:
-        if lista.count(card) == 2:
+        return (True, trips, pair)
+
+
+def trips(cards: list):
+    # returns (True, value of trips)
+    cardlist = []
+    for card in cards:
+        cardlist.append(card.value)
+    for card in cardlist:
+        if cardlist.count(card) == 3:
             return (True, card)
     return False
 
-def hicard(kortit: list):
-    # muuttaa ässän 14, muuten normaali ja palauttaa numerot järjestyksessä
-    lista = []
-    for kortti in kortit:
-        if kortti.arvo == 1:
-            lista.append(14)
+
+def two_pair(cards):
+    cards = []
+    for card in cards:
+        cards.append(card.arvo)
+    if len(set(cards)) == 3:
+        pairs = []
+        for card in cards:
+            if cards.count(card) == 2:
+                if card == 1:
+                    pairs.append(14)
+                    cards.remove(1)
+                else:
+                    pairs.append(card)
+                    cards.remove(card)
+        pairs.sort(reverse=True)
+        return True, pairs
+    return False
+
+
+def pair(cards: list):
+    cardlist = []
+    for card in cards:
+        cardlist.append(card.value)
+    for card in cardlist:
+        if cardlist.count(card) == 2:
+            return (True, card.value)
+    return False
+
+
+def hicard(cards: list):
+    # Ace = 14, returns sorted list, reverse is true
+    cardlist = []
+    for card in cards:
+        if card.arvo == 1:
+            cardlist.append(14)
         else:
-            lista.append(kortti.arvo)
-    return sorted(lista, reverse=True)
+            cardlist.append(card.arvo)
+    return sorted(cardlist, reverse=True)
 
 
-# määrittele_käsi toimii
-def maarittele_kasi(kortit: list):
-    if onko_suora(kortit) and onko_vari(kortit):
-        return f"{onko_vari(kortit)[1]}värisuora, suurin {onko_suora(kortit)[1]}"
+def name_hand(cards: list):
+    if is_straight(cards) and is_suited(cards):
+        return f"{is_suited(cards)[1]}straight flush, from {is_straight(cards)[1] - 4} to {is_straight(cards)[1]}"
 
-    elif neloset(kortit):
-        return f"{neloset(kortit)[1]}-neloset"
+    elif four_of_a_kind(cards):
+        return f"Four {four_of_a_kind(cards)[1]}s"
 
-    elif fullhouse(kortit):
-        return f"full house, {fullhouse(kortit)[1]} täynnä {fullhouse(kortit)[2]}"
+    elif fullhouse(cards):
+        return f"full house, {fullhouse(cards)[1]}s full of {fullhouse(cards)[2]}s"
 
-    elif onko_vari(kortit):
-        return f"{onko_vari(kortit)[1]}väri"
+    elif is_suited(cards):
+        return f"{is_suited(cards)[1]}-suit"
 
-    elif onko_suora(kortit):
-        return f"suora, {onko_suora(kortit)[1]}"
+    elif is_straight(cards):
+        return f"straight, {is_straight(cards)[1]-4} to {is_straight(cards)[1]}"
 
-    elif trips(kortit):
-        return f"{trips(kortit)[1]}-kolmoset"
+    elif trips(cards):
+        return f"Three of a kind, {trips(cards)[1]}s"
 
-    elif two_pair(kortit):
-        return f"kaksi paria, {two_pair(kortit)[1][0]} ja {two_pair(kortit)[1][1]}"
+    elif two_pair(cards):
+        return f"Two pair, {two_pair(cards)[1][0]}s and {two_pair(cards)[1][1]}s"
 
-    elif pair(kortit):
-        return f"{pair(kortit)[1]}-pari"
-
-    else:
-        return f"High card {hicard(kortit)[0]}"
-
-# palauttaa käden arvon, mahdollisen vertailukohteen ja viimeisenä iteminä [-1] kortit mahdollisia hiCard vertailuja varten
-def kaden_arvo(kortit: list):
-    if onko_suora(kortit) and onko_vari(kortit):
-        return 9, onko_suora(kortit)[1], kortit
-
-    elif neloset(kortit):
-        return 8, neloset(kortit)[1], kortit
-
-    elif fullhouse(kortit):
-        return 7, fullhouse(kortit)[1], fullhouse(kortit)[2], kortit
-
-    elif onko_vari(kortit):
-        return 6, kortit
-
-    elif onko_suora(kortit):
-        return 5, onko_suora(kortit)[1], kortit
-
-    elif trips(kortit):
-        return 4, trips(kortit)[1], kortit
-
-    elif two_pair(kortit):
-        return 3, two_pair(kortit)[1][0], two_pair(kortit)[1][1], kortit
-
-    elif pair(kortit):
-        return 2, pair(kortit)[1], kortit
+    elif pair(cards):
+        return f"Pair, {pair(cards)[1]}s"
 
     else:
-        return 1, hicard(kortit), kortit
+        return f"High card {hicard(cards)[0]}"
+
+
+# return the valuation of the hand, the cards needed for evaluation between hands of same valuation and
+# as a last item, (use -1 as index) all the cards for hiCard evals
+
+
+def evaluate_hand(cards: list):
+    if is_straight(cards) and is_suited(cards):
+        return 9, is_straight(cards)[1], cards
+
+    elif four_of_a_kind(cards):
+        return 8, four_of_a_kind(cards)[1], cards
+
+    elif fullhouse(cards):
+        return 7, fullhouse(cards)[1], fullhouse(cards)[2], cards
+
+    elif is_suited(cards):
+        return 6, cards
+
+    elif is_straight(cards):
+        return 5, is_straight(cards)[1], cards
+
+    elif trips(cards):
+        return 4, trips(cards)[1], cards
+
+    elif two_pair(cards):
+        return 3, two_pair(cards)[1][0], two_pair(cards)[1][1], cards
+
+    elif pair(cards):
+        return 2, pair(cards)[1], cards
+
+    else:
+        return 1, hicard(cards), cards
 
 
 def make_a_table():
@@ -269,37 +286,42 @@ def make_a_table():
         if name == "":
             MorePlayers = False
             break
-        player = Pelaaja(name)
+        player = Player(name)
         players.append(player)
     return players
 
-# Käsi
+# Hand player
 
-def hand2(pelaajat: list, pakka: Pakka):
-    hands = len(pelaajat)
-    #pelaajien kortit
+
+def hand2(players: list, pakka: Deck):
+    hands = len(players)
+    # players cards
     for i in range(2):
         for i in range(hands):
-            kortti = pakka.jaa()
-            player = pelaajat[i]
+            kortti = pakka.deal()
+            player = players[i]
             player.hand.append(kortti)
 
     community_cards = []
     for i in range(5):
-        community_cards.append(pakka.jaa())
-    
-    return community_cards, pelaajat
+        community_cards.append(pakka.deal())
+
+    return community_cards, players
+
 
 def main_hand():
-    pakka = Pakka()
+    pakka = Deck()
     pakka.kasaa()
     pakka.sekoita()
-    pelaajat = make_a_table()
-    return hand2(pelaajat, pakka)
+    players = make_a_table()
+    return hand2(players, pakka)
+
 
 peli = main_hand()
-    
-def hand_variations(player: Pelaaja, community_cards: list): # player by looping thru main_hand return value pelaajat,
+
+
+# player by looping thru main_hand return value players,
+def hand_variations(player: Player, community_cards: list):
     # community card by from main_hand return value community_cards
     holecards = player.hand
     communitycards = community_cards
@@ -312,9 +334,9 @@ def hand_variations(player: Pelaaja, community_cards: list): # player by looping
     #### THIS THING #####
     # makes all subgroups of four cards from five community cards, same logic will follow for subgroups of 3
 
-    ccl1 = communitycards[:] # community card list 1
-    cc1 = ccl1.pop(-1) # community card 1
-    vccl1 = ccl1[:] # variable ccl1
+    ccl1 = communitycards[:]  # community card list 1
+    cc1 = ccl1.pop(-1)  # community card 1
+    vccl1 = ccl1[:]  # variable ccl1
 
     four_card_list = []
 
@@ -336,5 +358,6 @@ def hand_variations(player: Pelaaja, community_cards: list): # player by looping
     four_card_list.append(vccl1)
     vccl1 = ccl1[:]
 # lisäilee pariin ekaan kortin kaksi kertaa ^^
+
 
 hand_variations(peli[1][0], peli[0])
